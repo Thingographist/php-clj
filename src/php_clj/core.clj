@@ -17,7 +17,7 @@
 
 (defn- parse-int [reader]
   (expect-char reader \:)
-  (-> reader (r/read-until \;) Integer.))
+  (-> reader (r/read-until \;) Long.))
 
 (defn- parse-double [reader]
   (expect-char reader \:)
@@ -96,7 +96,10 @@
 (defn- encode-map [clj]
   (str (reduce (fn [php keyval]
                  (str php
-                      (clj->php (key keyval))
+                      (clj->php 
+                        (let [kw (key keyval)] 
+                          (if (keyword? kw)
+                            (name kw) kw))
                       (clj->php (val keyval))))
                (str "a:" (count clj) ":{")
                clj)
